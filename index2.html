@@ -1,0 +1,259 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>jDigiClock - Digital Clock (HTC Hero inspired).</title>
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+        <link rel="stylesheet" type="text/css" href="css/jquery.jdigiclock.css" />
+        <script type="text/javascript" src="lib/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="lib/jquery.jdigiclock.js"></script>
+        <script type="text/javascript">
+        
+          function getServerTime () {
+                $.get("/cgi-bin/showtime_brisbane.pl" , displayDigiClock);
+          }
+        
+          function displayDigiClock(sText, sStatus) {
+               if (sStatus == "success")  {
+                  var nOffset = calcServerOffset(sText);
+                  $('#digiclock').jdigiclock({
+                                        weatherLocationCode: '1100661',
+                                        svrOffset: nOffset
+                  });
+               }  else  {
+                  $("div#ServerTime").html("An error occurred.");
+                  $('#digiclock').jdigiclock({
+                                        weatherLocationCode: '1100661',
+                                        svrOffset: 0
+                  });
+               }
+          }
+        
+          function calcServerOffset (sText) {
+             var nCalcOffset = 0;
+             var nYear     = parseInt(sText.substring(0,4));
+             var nMonth    = parseInt(sText.substring(5,7))-1;
+             var nDay      = parseInt(sText.substring(8,10));
+             var nHour     = parseInt(sText.substring(11,13));
+             var nMinutes  = parseInt(sText.substring(14,16));
+             var nSeconds  = parseInt(sText.substring(17,19));
+     
+             var dServerDT = new Date (nYear, nMonth, nDay, nHour, nMinutes, nSeconds, 0);
+             var dClientDT = new Date ();
+     
+             nCalcOffset = dClientDT - dServerDT ; // time offset between server and client in milliseconds
+             return nCalcOffset;
+          }
+
+        </script>
+        
+        <script type="text/javascript">
+            $(document).ready(function() {
+               getServerTime();
+            });
+        </script>
+    </head>
+    <body>
+        <div id="wrap">
+            <h1>jDigiClock</h1>
+            <h2>Digital Clock (HTC Hero inspired)</h2>
+            <p>
+                <strong>Author:</strong> <a href="http://www.radoslavdimov.com/">Radoslav Dimov</a><br />
+                <strong>Changed to YQL:</strong> <a href="http://www.baldwhiteguy.co.nz/">Andrew Mercer</a><br />
+                <strong>Version:</strong> 2.1.3 (<a href="changelog.html">Changelog</a>)<br />
+                <strong>Download:</strong> <a href="http://www.baldwhiteguy.co.nz/jdigiclock/jdigiclock.zip">jdigiclock.zip</a><br />
+                <strong>Licence:</strong> Dual licensed under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT</a> and <a href="http://www.opensource.org/licenses/gpl-license.php">GPL</a> licenses.
+            </p>
+            <h3>Contents</h3>
+            <ol>
+                <li><a href="#Introduction">Introduction</a></li>
+                <li><a href="#Examples">Examples</a></li>
+                <li><a href="#Getting-Started">Getting started</a></li>
+                <li><a href="#Configuration">Configuration</a></li>
+                <li><a href="#Using Server Offset">Using Server Offset</a></li>
+                <li><a href="#Compatibility">Compatibility</a></li>  
+            </ol>
+            <a name="Introduction"></a>
+            <h3>Introduction</h3>
+            <p>
+                jDigiClock is a <a href="http://jquery.com">jQuery</a> plugin inspired from HTC Hero Clock Widget.
+            </p>
+            <a name="Examples"></a>
+            <h3>Examples</h3>
+            <div id="digiclock"></div>
+            <br /><br />
+            <a name="Getting-Started"></a>
+            <h3>Getting started</h3>
+            <p>
+                To use the jDigiClock plugin, include the <a href="http://jquery.com">jQuery</a>
+                library, the jDigiClock source file and jDigiClock core stylesheet file inside the <code>&lt;head&gt;</code> tag
+                of your HTML document:
+            </p>
+<pre>
+&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;css/jquery.jdigiclock.css&quot; /&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;lib/jquery-1.10.2.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;lib/jquery.jdigiclock.js&quot;&gt;&lt;/script&gt;
+</pre>
+            <p>
+                To setup jDigiClock, add the following code inside the <code>&lt;head&gt;</code>
+                tag of your HTML document:
+            </p>
+<pre>
+&lt;script type=&quot;text/javascript&quot;&gt;
+    $(document).ready(function() {
+        $('#digiclock').jdigiclock({
+            // Configuration goes here
+        });
+    });
+&lt;/script&gt;
+</pre>
+            <p>
+                jDigiClock accepts a lot of configuration options, see chapter "<a href="#Configuration">Configuration</a>"
+                for further informations.
+            </p>
+
+            <p>jDigiClock expects a very basic HTML markup structure inside your HTML document:</p>
+<pre>
+&lt;div id=&quot;digiclock&quot;&gt;&lt;/div&gt;
+</pre>
+            <a name="Configuration"></a>
+            <h3>Configuration</h3>
+            <p>
+                jDigiClock accepts a list of options to control the appearance and behaviour
+                of the Digital Clock. Here is the list of options you may set:
+            </p>
+            <table> 
+                <tr>
+                    <th>Property</th>
+                    <th>Type</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>imagesPath</td>
+                    <td>string</td>
+                    <td>"images/"</td>
+                    <td>Base path to image files. Clock and Weather images are located in subdirectories below this.</td>
+                </tr>
+                <tr>
+                    <td>am_pm</td>
+                    <td>boolean</td>
+                    <td>false</td>
+                    <td>Specifies the AM/PM option.</td>
+                </tr>
+                <tr>
+                    <td>weatherLocationCode</td>
+                    <td>string</td>
+                    <td>"1100661"</td>
+                    <td>Weather location code (see lookup: <a href="http://woeid.rosselliot.co.nz/" target="_blank">woeid.rosselliot.co.nz</a>).</td>
+                </tr>
+                <tr>
+                    <td>weatherMetric</td>
+                    <td>string</td>
+                    <td>"c"</td>
+                    <td>Specifies the weather metric mode: C or F.</td>
+                </tr>
+                <tr>
+                    <td>weatherUpdate</td>
+                    <td>integer</td>
+                    <td>0</td>
+                    <td>Weather update in minutes.</td>
+                </tr>
+                <tr>
+                    <td>svrOffset</td>
+                    <td>integer</td>
+                    <td>0</td>
+                    <td>Server offset in milliseconds.</td>
+                </tr>
+            </table>
+            <a name="Using Server Offset"></a>
+            <h3>Using Server Offset</h3>
+            <p>
+                The server offset can be used to return a time in a specific timezone. This offset is
+                the difference between the user's local timezone and the time in the target timezone as
+                returned by the server. Since we don't know the user's timezone, this means the offset
+                needs to be calculated using an additional function.
+            </p>
+            <p>
+                Time in the target timezone can be returned using a PERL script on the server, such as:       
+            </p>
+<pre>
+use DateTime;
+my $time = DateTime->now( time_zone => 'Australia/Brisbane' );
+print &quot;Content-type:text/html\r\n\r\n&quot;;
+print &quot;$time\n&quot;;
+</pre>
+            <p>
+                The server offset can be calculated using a JavaScript function. This function is then
+                used to call the jdigiclock script so that the offset is available.       
+            </p>
+<pre>
+&lt;script type=&quot;text/javascript&quot;&gt;
+
+  function getServerTime () {
+        $.get(&quot;/cgi-bin/showtime_brisbane.pl&quot; , displayDigiClock);
+  }
+
+  function displayDigiClock(sText, sStatus) {
+       if (sStatus == &quot;success&quot;)  {
+          var nOffset = calcServerOffset(sText);
+          $('#digiclock').jdigiclock({
+                                weatherLocationCode: '1100661',
+                                svrOffset: nOffset
+          });
+       }  else  {
+          $(&quot;div#ServerTime&quot;).html(&quot;An error occurred.&quot;);
+          $('#digiclock').jdigiclock({
+                                weatherLocationCode: '1100661',
+                                svrOffset: 0
+          });
+       }
+  }
+
+  function calcServerOffset (sText) {
+     var nCalcOffset = 0;
+     var nYear     = parseInt(sText.substring(0,4));
+     var nMonth    = parseInt(sText.substring(5,7))-1;
+     var nDay      = parseInt(sText.substring(8,10));
+     var nHour     = parseInt(sText.substring(11,13));
+     var nMinutes  = parseInt(sText.substring(14,16));
+     var nSeconds  = parseInt(sText.substring(17,19));
+     
+     var dServerDT = new Date (nYear, nMonth, nDay, nHour, nMinutes, nSeconds, 0);
+     var dClientDT = new Date ();
+     
+     nCalcOffset = dClientDT - dServerDT ; // time offset between server and client in milliseconds
+     return nCalcOffset;
+  }
+
+&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+    $(document).ready(function() {
+       getServerTime();
+    });
+&lt;/script&gt;
+</pre>
+            <a name="Compatibility"></a>
+            <h3>Compatibility</h3>
+            <p>jDigiClock has been tested and works on the following browsers:</p>
+            <ul>
+                <li>Internet Explorer 7 (PC)</li>
+                <li>FireFox 3.5 (PC/Linux)</li>
+                <li>Google Chrome 3.0 (PC)</li>
+                <li>Safari 4.0 (PC)</li>
+            </ul>
+            <!--
+            <h3>Donate a beer or two via PayPal</h3>
+            <div>
+                <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                    <input type="hidden" name="cmd" value="_s-xclick" />
+                    <input type="hidden" name="hosted_button_id" value="9375573" />
+                    <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="PayPal - The safer, easier way to pay online!" />
+                    <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+                </form>
+            </div>
+            -->
+        </div>
+    </body>
+</html>
